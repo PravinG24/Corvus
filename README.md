@@ -47,7 +47,7 @@ cd Pierce-C2
 mv .env.example .env
 nano .env
 
-# Insert your keys:
+### Insert your keys:
 SHODAN_API_KEY="your_key_here"
 GREYNOISE_API_KEY="your_key_here"
 NVIDIA_NIM_KEY="your_key_here"
