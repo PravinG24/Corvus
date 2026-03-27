@@ -10,7 +10,7 @@
 ---
 
 ## 📖 Overview
-**Pierce** is a stealthy, mobile-first Command and Control (C2) and OSINT automation framework. Built to run on headless homelab hardware, it completely decouples the operator from their laptop. 
+**Corvus** is a stealthy, mobile-first Command and Control (C2) and OSINT automation framework. Built to run on headless homelab hardware, it completely decouples the operator from their laptop. 
 
 By routing a Python/Flask orchestrator through an encrypted Tailscale WireGuard mesh, an operator can execute multi-vector reconnaissance strikes directly from a Progressive Web App (PWA) on their smartphone over a 5G network. To eliminate the bottleneck of manual data correlation, the framework pipes asynchronous API telemetry into the **NVIDIA NIM API (Step Flash 3.5)**, utilizing strict prompt engineering to instantly generate formatted, actionable Target Dossiers.
 
