@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>DEDSEC // DATA_DUMP</title>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@700&display=swap" rel="stylesheet">
+    <link rel="manifest" href="/static/manifest.json">
+    <style>
+        :root {
+            --dedsec-cyan: #00e5ff;
+            --dedsec-white: #ffffff;
+            --dedsec-red: #ff003c;
+            --bg-black: #050505;
+        }
+
+        /* --- Fullscreen Boot Sequence --- */
+    #bootScreen {
+        position: fixed; top: 0; left: 0;
+        width: 100vw; height: 100vh;
+        background: var(--bg-black);
+        z-index: 9999;
+        display: flex; flex-direction: column;
+        justify-content: center; align-items: center;
+        cursor: pointer;
+    }
+
+    .boot-skull {
+        font-size: 6rem; /* Massive skull */
+        margin-bottom: 30px;
+        text-shadow: 0 0 20px rgba(255,255,255,0.8);
+    }
+
+    .boot-text {
+        letter-spacing: 8px;
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: var(--dedsec-white);
+        animation: pulseText 1.5s infinite;
+    }
+
+    @keyframes pulseText {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.3; }
+    }
+
+        body {
+        background-color: var(--bg-black);
+        color: var(--dedsec-white);
+        font-family: 'Share Tech Mono', monospace;
+        margin: 0; padding: 15px;
+        display: flex; flex-direction: column;
+        min-height: 100vh;
+        box-sizing: border-box;
+        background-image: linear-gradient(rgba(0, 229, 255, 0.05) 1px, transparent 1px),
+                          linear-gradient(90deg, rgba(0, 229, 255, 0.05) 1px, transparent 1px);
+        background-size: 30px 30px;
+    }
+
+    /* --- Vertical Header --- */
+    .header {
+        width: 100%;
+        border-left: 4px solid var(--dedsec-white);
+        padding: 10px 15px;
+        margin-bottom: 20px;
+        box-sizing: border-box;
+    }
+    .header h1 {
+        font-family: 'Rajdhani', sans-serif;
+        font-size: 1.8rem; margin: 0; line-height: 1.1;
+    }
+    .status-bar { font-size: 0.8rem; color: var(--dedsec-cyan); margin-top: 5px; }
+
+    /* --- The Nexus Area (Stacked Inputs) --- */
+    .nexus-container {
+        width: 100%;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 20px;
+        margin-bottom: 20px;
+        box-sizing: border-box;
+        /* Angular DedSec Clip */
+        clip-path: polygon(0 0, 100% 0, 100% 90%, 90% 100%, 0 100%);
+    }
+
+    .input-wrap {
+        display: flex; flex-direction: column; gap: 12px;
+    }
+
+    input, select {
+        width: 100%;
+        background: #000;
+        border: 1px solid var(--dedsec-cyan);
+        color: var(--dedsec-white);
+        padding: 15px;
+        font-family: 'Share Tech Mono', monospace;
+        font-size: 1rem;
+        box-sizing: border-box;
+        outline: none;
+    }
+
+    button {
+        width: 100%;
+        background: var(--dedsec-white);
+        color: #000;
+        border: none;
+        padding: 18px;
+        font-family: 'Rajdhani', sans-serif;
+        font-weight: 700; font-size: 1.3rem;
+        text-transform: uppercase;
+        clip-path: polygon(0 0, 100% 0, 100% 70%, 85% 100%, 0 100%);
+    }
+
+    /* --- Vertical Terminal (Below Inputs) --- */
+     #terminal {
+        width: 100%;
+        flex-grow: 1; /* Pushes to bottom of screen */
+        background: rgba(0,0,0,0.9);
+        border: 1px solid rgba(255,255,255,0.1);
+        padding: 20px 15px;
+        font-size: 0.95rem;
+        line-height: 1.5;
+        white-space: pre-wrap;
+        box-sizing: border-box;
+        position: relative;
+    }
+
+    .live-tag {
+        background: var(--dedsec-red);
+        color: white;
+        font-size: 0.7rem;
+        padding: 2px 8px;
+        position: absolute;
+        top: -10px; left: 15px;
+        font-weight: bold;
+    }
+</style>
+
+<body>
+<div id="bootScreen" onclick="initializeOS()">
+    <div class="boot-skull">☠</div>
+    <div class="boot-text">[ INITIALIZE LINK ]</div>
+</div>
+
+<div id="mainUI" style="display:none; flex-direction: column; width: 100%;">
+    <div class="header">
+        <h1>RECONNAISSANCE</h1>
+        <div class="status-bar">COMMENCE TARGET SCANNING</div>
+    </div>
+
+    <div class="nexus-container">
+        <div class="input-wrap">
+            <select id="scanType">
+                <option value="ip">INFRASTRUCTURE SCAN</option>
+                <option value="domain">OSINT DOMAIN ENUM</option>
+            </select>
+            <input type="text" id="target" placeholder="TARGET_ADDR..." autocomplete="off">
+            <button onclick="launchStrike()">INITIATE DATA DUMP</button>
+        </div>
+    </div>
+
+    <div id="terminal">
+        <div class="live-tag">LIVE_DATA_FEED</div>
+        <div id="termText" style="text-align: left; margin-top: 15px;">Awaiting handshake...</div>
+    </div>
+</div>
+
+<script>
+    function initializeOS() {
+        const docEl = document.documentElement;
+        if (docEl.requestFullscreen) docEl.requestFullscreen();
+        document.getElementById('bootScreen').style.display = 'none';
+        document.getElementById('mainUI').style.display = 'flex';
+    }
+
+    async function launchStrike() {
+        const targetVal = document.getElementById('target').value;
+        const scanTypeVal = document.getElementById('scanType').value;
+        const term = document.getElementById('termText');
+        const btn = document.querySelector('button');
+
+        if(!targetVal) return;
+
+        term.innerHTML = "> INITIATING HANDSHAKE...\n> EXECUTING REMOTE_SCRIPT...\n> LOADING...";
+        btn.disabled = true;
+        btn.innerText = "TRANSFERRING...";
+
+        try {
+            const response = await fetch('/fire', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json', // The strict bouncer bypass
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({
+                    "target": targetVal,        // Variable 1
+                    "type": scanTypeVal    // Variable 2
+                })
+            });
+
+            // Read the backend response
+            const data = await response.json();
+
+            // Print the output to the terminal screen
+            let finalOutput = data.output ? data.output.replace(/^\s+/, "") : "DATA DUMP COMPLETE.";
+            term.innerHTML = finalOutput;
+
+        } catch (e) {
+            term.innerHTML = "!! CONNECTION_LOST !!\n" + e;
+        } finally {
+            btn.disabled = false;
+            btn.innerText = "INITIATE DATA DUMP";
+        }
+    }
+</script>
+</body>
+</html>
